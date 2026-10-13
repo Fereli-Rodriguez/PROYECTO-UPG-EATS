@@ -1,0 +1,704 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar negocio | UPG EATS</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --verde: #16834a;
+            --verde-oscuro: #106538;
+            --verde-claro: #eaf8ee;
+            --fondo: #f6faf5;
+            --texto: #20352a;
+            --gris: #6b786f;
+            --borde: #dce8de;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--fondo);
+            color: var(--texto);
+            min-height: 100vh;
+        }
+
+        header {
+            background: white;
+            border-bottom: 1px solid var(--borde);
+            padding: 18px 7%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .logo {
+            color: var(--verde);
+            font-size: 27px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: #f0a72f;
+        }
+
+        .volver {
+            color: var(--verde-oscuro);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .portada {
+            background: linear-gradient(135deg, #e0f6e5, #f6fbeb);
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .etiqueta {
+            display: inline-block;
+            background: white;
+            color: var(--verde);
+            padding: 7px 13px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .portada h1 {
+            font-size: clamp(28px, 5vw, 42px);
+            margin-bottom: 12px;
+        }
+
+        .portada p {
+            color: #52685a;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        main {
+            max-width: 850px;
+            padding: 28px 16px 55px;
+            margin: auto;
+        }
+
+        .aviso {
+            background: #fff8e7;
+            border: 1px solid #f0dfac;
+            color: #70591d;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .formulario {
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 20px;
+            padding: clamp(18px, 4vw, 34px);
+            box-shadow: 0 8px 30px rgba(31, 80, 45, 0.06);
+        }
+
+        .seccion {
+            margin-bottom: 30px;
+        }
+
+        .seccion h2 {
+            font-size: 20px;
+            margin-bottom: 7px;
+        }
+
+        .ayuda {
+            color: var(--gris);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .rejilla {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 17px;
+        }
+
+        .campo {
+            min-width: 0;
+        }
+
+        .completo {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        .opcional {
+            color: var(--gris);
+            font-weight: normal;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #d4e1d7;
+            border-radius: 10px;
+            background: #fff;
+            color: var(--texto);
+            font: inherit;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--verde);
+            box-shadow: 0 0 0 3px rgba(22, 131, 74, 0.10);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .producto {
+            border: 1px solid var(--borde);
+            background: #fbfefb;
+            border-radius: 14px;
+            padding: 17px;
+            margin-bottom: 14px;
+        }
+
+        .producto-cabecera {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .producto-cabecera strong {
+            color: var(--verde-oscuro);
+        }
+
+        .producto-campos {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 14px;
+        }
+
+        .producto-campos .campo:last-child {
+            grid-column: 1 / -1;
+        }
+
+        button {
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .quitar {
+            background: #fff0ef;
+            color: #b63d35;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+
+        .quitar:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        .agregar {
+            width: 100%;
+            padding: 12px;
+            border: 1px dashed var(--verde);
+            background: var(--verde-claro);
+            color: var(--verde-oscuro);
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .agregar:hover {
+            background: #d9f2df;
+        }
+
+        .separador {
+            border: none;
+            border-top: 1px solid var(--borde);
+            margin: 28px 0;
+        }
+
+        .enviar {
+            width: 100%;
+            background: var(--verde);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background .2s;
+        }
+
+        .enviar:hover {
+            background: var(--verde-oscuro);
+        }
+
+        .enviar:disabled {
+            opacity: .65;
+            cursor: wait;
+        }
+
+        #mensaje {
+            display: none;
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        #mensaje.exito {
+            display: block;
+            color: #155d32;
+            background: #e7f7eb;
+            border: 1px solid #bce5c7;
+        }
+
+        #mensaje.error {
+            display: block;
+            color: #8a2828;
+            background: #fff0ef;
+            border: 1px solid #f0c6c2;
+        }
+
+        .nota-final {
+            color: var(--gris);
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--gris);
+            padding: 22px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 16px;
+            }
+
+            .logo {
+                font-size: 23px;
+            }
+
+            .rejilla,
+            .producto-campos {
+                grid-template-columns: 1fr;
+            }
+
+            .producto-campos .campo:last-child {
+                grid-column: auto;
+            }
+
+            .portada {
+                padding: 32px 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <a class="logo" href="index.html">UPG <span>EATS</span></a>
+    <a class="volver" href="index.html">← Volver al inicio</a>
+</header>
+
+<section class="portada">
+    <div class="etiqueta">🌮 Comunidad emprendedora UPG</div>
+    <h1>¡Registra tu negocio!</h1>
+    <p>
+        Comparte lo que vendes, agrega tus productos y permite que
+        más estudiantes conozcan tu emprendimiento.
+    </p>
+</section>
+
+<main>
+    <div class="aviso">
+        💚 Tu solicitud quedará pendiente de revisión.
+        El negocio no aparecerá públicamente hasta que sea aprobado.
+    </div>
+
+    <form id="formRegistro" class="formulario">
+
+        <div id="mensaje" role="status" aria-live="polite"></div>
+
+        <section class="seccion">
+            <h2>🏪 Información del negocio</h2>
+            <p class="ayuda">
+                Cuéntanos quién eres y qué vendes dentro de la universidad.
+                Los campos con * son obligatorios.
+            </p>
+
+            <div class="rejilla">
+                <div class="campo">
+                    <label for="nombre">Nombre del negocio *</label>
+                    <input id="nombre" maxlength="100" required
+                           placeholder="Ej. Cinnamoroll">
+                </div>
+
+                <div class="campo">
+                    <label for="responsable">Nombre del responsable *</label>
+                    <input id="responsable" maxlength="100" required
+                           placeholder="Tu nombre">
+                </div>
+
+                <div class="campo">
+                    <label for="categoria">Categoría *</label>
+                    <select id="categoria" required>
+                        <option value="">Selecciona una categoría</option>
+                        <option value="Postres">Postres</option>
+                        <option value="Bebidas">Bebidas</option>
+                        <option value="Snacks">Snacks</option>
+                        <option value="Comida">Comida</option>
+                        <option value="Dulces">Dulces</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="telefono">Teléfono de contacto *</label>
+                    <input id="telefono" type="tel" maxlength="20"
+                           required placeholder="Tu teléfono">
+                </div>
+
+                <div class="campo completo">
+                    <label for="descripcion">
+                        Descripción <span class="opcional">(opcional)</span>
+                    </label>
+                    <textarea id="descripcion" maxlength="500"
+                              placeholder="Cuéntanos un poco sobre tu negocio"></textarea>
+                </div>
+
+                <div class="campo completo">
+                    <label for="redes">
+                        Redes sociales <span class="opcional">(opcional)</span>
+                    </label>
+                    <input id="redes" maxlength="200"
+                           placeholder="Instagram, Facebook, etc.">
+                </div>
+            </div>
+        </section>
+
+        <hr class="separador">
+
+        <section class="seccion">
+            <h2>📍 ¿Dónde y cuándo vendes?</h2>
+            <p class="ayuda">
+                Ayuda a otros estudiantes a encontrarte.
+            </p>
+
+            <div class="rejilla">
+                <div class="campo completo">
+                    <label for="ubicacion">
+                        Ubicación dentro de la UPG
+                        <span class="opcional">(opcional)</span>
+                    </label>
+                    <input id="ubicacion" maxlength="150"
+                           placeholder="Ej. Edificio A">
+                </div>
+
+                <div class="campo">
+                    <label for="dias">Días de venta</label>
+                    <input id="dias" maxlength="100"
+                           placeholder="Ej. Lunes a viernes">
+                </div>
+
+                <div class="campo">
+                    <label for="horaInicio">Hora de inicio</label>
+                    <input id="horaInicio" type="time">
+                </div>
+
+                <div class="campo">
+                    <label for="horaFin">Hora de cierre</label>
+                    <input id="horaFin" type="time">
+                </div>
+            </div>
+        </section>
+
+        <hr class="separador">
+
+        <section class="seccion">
+            <h2>🧁 Tus productos</h2>
+            <p class="ayuda">
+                Agrega los productos que vendes y sus precios.
+                Debes registrar al menos uno.
+            </p>
+
+            <div id="listaProductos"></div>
+
+            <button type="button" class="agregar" id="btnAgregar">
+                + Agregar otro producto
+            </button>
+        </section>
+
+        <hr class="separador">
+
+        <button class="enviar" id="btnEnviar" type="submit">
+            Enviar solicitud de registro
+        </button>
+
+        <p class="nota-final">
+            Al enviar tu solicitud, aceptas que tus datos sean utilizados
+            para revisar y gestionar tu registro en UPG EATS.
+        </p>
+    </form>
+</main>
+
+<footer>
+    UPG EATS · Una comunidad para apoyar los emprendimientos estudiantiles 💚
+</footer>
+
+<script>
+    // CONFIGURACIÓN DE SUPABASE
+    const SUPABASE_URL =
+        "https://ikzpzwpghpjjbmfprjwt.supabase.co";
+
+    const SUPABASE_ANON_KEY =
+        "sb_publishable_Rk5H2UolM5ubOqwa14YQfA_MCKfMgu6";
+
+    const mensaje = document.getElementById("mensaje");
+    const listaProductos = document.getElementById("listaProductos");
+    const btnEnviar = document.getElementById("btnEnviar");
+    const form = document.getElementById("formRegistro");
+
+    let sb = null;
+    let contadorProductos = 0;
+
+    function mostrarMensaje(texto, tipo) {
+        mensaje.textContent = texto;
+        mensaje.className = tipo;
+        mensaje.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+    }
+
+    function crearProducto() {
+        contadorProductos++;
+
+        const tarjeta = document.createElement("div");
+        tarjeta.className = "producto";
+
+        tarjeta.innerHTML = `
+            <div class="producto-cabecera">
+                <strong>Producto ${contadorProductos}</strong>
+                <button type="button" class="quitar">Quitar</button>
+            </div>
+
+            <div class="producto-campos">
+                <div class="campo">
+                    <label>Nombre del producto *</label>
+                    <input class="pNombre" maxlength="100"
+                           required placeholder="Ej. Carlota">
+                </div>
+
+                <div class="campo">
+                    <label>Precio en pesos *</label>
+                    <input class="pPrecio" type="number"
+                           min="0" max="100000" step="0.01"
+                           required placeholder="Ej. 35">
+                </div>
+
+                <div class="campo">
+                    <label>Descripción
+                        <span class="opcional">(opcional)</span>
+                    </label>
+                    <textarea class="pDescripcion" maxlength="300"
+                              placeholder="Descripción del producto"></textarea>
+                </div>
+            </div>
+        `;
+
+        tarjeta.querySelector(".quitar").addEventListener("click", () => {
+            tarjeta.remove();
+            renumerarProductos();
+        });
+
+        listaProductos.appendChild(tarjeta);
+        renumerarProductos();
+    }
+
+    function renumerarProductos() {
+        const tarjetas = listaProductos.querySelectorAll(".producto");
+
+        tarjetas.forEach((tarjeta, indice) => {
+            tarjeta.querySelector(".producto-cabecera strong")
+                .textContent = "Producto " + (indice + 1);
+
+            tarjeta.querySelector(".quitar").disabled =
+                tarjetas.length === 1;
+        });
+    }
+
+    document.getElementById("btnAgregar").addEventListener("click", () => {
+        crearProducto();
+    });
+
+    // Iniciar con un producto
+    crearProducto();
+
+    form.addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+
+        // Comprobar que la clave esté configurada
+        if (
+            !SUPABASE_ANON_KEY ||
+            SUPABASE_ANON_KEY === "PEGA_AQUI_TU_CLAVE_PUBLICABLE"
+        ) {
+            mostrarMensaje(
+                "Falta configurar la clave pública de Supabase en el código.",
+                "error"
+            );
+            return;
+        }
+
+        if (!window.supabase) {
+            mostrarMensaje(
+                "No se pudo cargar Supabase. Comprueba tu conexión a internet.",
+                "error"
+            );
+            return;
+        }
+
+        if (!sb) {
+            sb = window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_ANON_KEY
+            );
+        }
+
+        const tarjetas = [
+            ...listaProductos.querySelectorAll(".producto")
+        ];
+
+        if (tarjetas.length === 0) {
+            mostrarMensaje("Agrega al menos un producto.", "error");
+            return;
+        }
+
+        // Obtener los datos del negocio
+        const negocio = {
+            nombre: document.getElementById("nombre").value.trim(),
+            responsable: document.getElementById("responsable").value.trim(),
+            categoria: document.getElementById("categoria").value,
+            descripcion: document.getElementById("descripcion").value.trim(),
+            telefono: document.getElementById("telefono").value.trim(),
+            redes: document.getElementById("redes").value.trim(),
+            dias: document.getElementById("dias").value.trim(),
+            ubicacion: document.getElementById("ubicacion").value.trim(),
+            hora_inicio: document.getElementById("horaInicio").value || null,
+            hora_fin: document.getElementById("horaFin").value || null
+        };
+
+        // Obtener los productos
+        const productos = tarjetas.map((tarjeta) => ({
+            nombre: tarjeta.querySelector(".pNombre").value.trim(),
+            precio: Number(tarjeta.querySelector(".pPrecio").value),
+            descripcion: tarjeta.querySelector(".pDescripcion").value.trim()
+        }));
+
+        const productoInvalido = productos.some((producto) =>
+            !producto.nombre ||
+            !Number.isFinite(producto.precio) ||
+            producto.precio < 0 ||
+            producto.precio > 100000
+        );
+
+        if (productoInvalido) {
+            mostrarMensaje(
+                "Revisa los nombres y precios de tus productos.",
+                "error"
+            );
+            return;
+        }
+
+        btnEnviar.disabled = true;
+        btnEnviar.textContent = "Enviando solicitud...";
+
+        mostrarMensaje(
+            "Estamos guardando tu negocio y sus productos...",
+            "exito"
+        );
+
+        try {
+            const { data, error } = await sb.rpc(
+                "registrar_negocio",
+                {
+                    p_negocio: negocio,
+                    p_productos: productos
+                }
+            );
+
+            if (error) {
+                console.error("Error de Supabase:", error);
+                throw error;
+            }
+
+            console.log("Registro guardado. ID del negocio:", data);
+
+            mostrarMensaje(
+                "¡Registro enviado correctamente! Tu negocio quedó pendiente de revisión. Gracias por formar parte de UPG EATS 💚",
+                "exito"
+            );
+
+            form.reset();
+            listaProductos.innerHTML = "";
+            contadorProductos = 0;
+            crearProducto();
+
+        } catch (error) {
+            console.error("Error completo:", error);
+            console.error("Mensaje:", error.message);
+            console.error("Código:", error.code);
+            console.error("Detalles:", error.details);
+            console.error("Sugerencia:", error.hint);
+
+            mostrarMensaje(
+                "No se pudo guardar el registro. " +
+                (error.message || "Revisa la configuración de Supabase."),
+                "error"
+            );
+
+        } finally {
+            btnEnviar.disabled = false;
+            btnEnviar.textContent = "Enviar solicitud de registro";
+        }
+    });
+</script>
+
+</body>
+</html>
